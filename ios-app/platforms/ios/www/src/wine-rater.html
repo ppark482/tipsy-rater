@@ -1,0 +1,21 @@
+<html><head><link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+
+</head><body><dom-module id="wine-rater">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+
+                padding: 10px;
+            }
+        </style>
+        
+        <div class="card">
+            <h1>Wine Rater</h1>
+        </div>
+    </template>
+
+    <script>Polymer({is:"wine-rater",properties:{activeRoute:{type:String,reflectToAttribute:!0,observer:"_activeRoute"}},_activeRoute:function(e){e&&e.path&&"wine"===e.path.split("/")[1]&&this.load()},load:function(){console.log("wine rater page")}});</script>
+</dom-module>
+</body></html>

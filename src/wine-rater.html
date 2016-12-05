@@ -1,0 +1,149 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<dom-module id="wine-rater">
+    <template>
+        <style include="shared-styles">
+            :host {
+                @apply(--layout-fit);
+                overflow: hidden;
+            }
+
+            input, textarea {
+              -webkit-appearance: none;
+              -webkit-border-radius: 0;
+              border-radius: 0;
+            }
+            input:focus {
+                outline: none;
+            }
+            #file {
+                width: 100%;
+            }
+            #previewImage {
+                max-height: 350px;
+                max-width: 350px;
+            }
+            .custom-file-input::-webkit-file-upload-button {
+                visibility: hidden;
+            }
+            .custom-file-input::before {
+                content: 'TAKE PIC';
+                display: inline-block;
+                background: -webkit-linear-gradient(top, #f9f9f9, #e3e3e3);
+                border: 1px solid #999;
+                border-radius: 0;
+                padding: 40px 125px;
+                outline: none;
+                white-space: nowrap;
+                -webkit-user-select: none;
+                cursor: pointer;
+                text-shadow: 1px 1px #fff;
+                font-weight: 700;
+                font-size: 18px;
+            }
+            .custom-file-input:hover::before {
+                border-color: black;
+            }
+            .custom-file-input:active::before {
+                background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
+            }
+        </style>
+
+        <div class="fit layout vertical" style="padding-top:64px;width:100%;">
+            <input id="file" type="file" name="file" accept="image/*" capture on-change="_handleImage" class="custom-file-input" hidden$="{{previewing}}">
+            <img id="previewImage">
+            <paper-button on-tap="_rateThisWine" hidden$="{{!previewing}}">RATE THIS WINE</paper-button>
+        </div>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'wine-rater',
+                properties: {
+                    activeRoute: {
+                        type: String,
+                        reflectToAttribute: true,
+                        observer: '_activeRoute'
+                    },
+                    previewing: {
+                        type: Boolean,
+                        notify: true,
+                        value: false
+                    },
+                    imageToUpload: {
+                        type: Object,
+                        reflectToAttribute: true,
+                        notify: true
+                    }
+                },
+                _activeRoute: function (route) {
+                    if(route && route.path && route.path.split('/')[1] === 'wine' && route.path.split('/')[2] === 'snap') {
+                        this.pageName = 'Wine';
+                    }
+                },
+                // _dataURItoBlob: function(dataURI) {
+                //     var byteString;
+                //     if (dataURI.split(',')[0].indexOf('base64') >= 0) {
+                //         byteString = atob(dataURI.split(',')[1]);
+                //     } else {
+                //         byteString = unescape(dataURI.split(',')[1]);
+                //     }
+                //     var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+                //     // write the bytes of the string to a typed array
+                //     var ia = new Uint8Array(byteString.length);
+                //     for (var i = 0; i < byteString.length; i++) {
+                //         ia[i] = byteString.charCodeAt(i);
+                //     }
+                //     return new Blob([ia], {type:mimeString});
+                // },
+                _handleImage: function(e) {
+                    var img = this.$.previewImage;
+                    var imageFile;
+                    var self = this;
+                    if (e.path) {
+                        imageFile = e.path[0].files[0];
+                    } else if (e.target && e.target.files) {
+                        imageFile = e.target.files[0];
+                    }
+                    canvasResize(imageFile, {
+                        width: 300,
+                        height: 0,
+                        crop: false,
+                        quality: 80,
+                        rotate: 0,
+                        callback: function(data, width, height, file) {
+                            img.src = data;
+                            self.imageData = data;
+                            self.imageToUpload = file;
+                            // console.log('image to upload: ', self.imageToUpload);
+                            self.previewing = true;
+                        }
+                    });
+                    // var reader = new FileReader();
+                    // reader.onload = (function(aImg) {
+                    //     return function(e) {
+                    //         aImg.src = e.target.result;
+                    //     }; })(img);
+                    // reader.readAsDataURL(imageFile);
+                },
+                _rateThisWine: function(e) {
+                    if (this.imageToUpload) {
+                        this.previewing = false;
+                        this.$.previewImage.src = '';
+
+                        e.preventDefault();
+                        window.history.pushState({}, null, '/wine/stats');
+                        window.dispatchEvent(new CustomEvent('location-changed'));
+                    }
+                }
+            });
+        })();
+    </script>
+</dom-module>

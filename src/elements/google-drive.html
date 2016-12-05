@@ -1,0 +1,66 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../shared-styles.html">
+
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="fabric-js/fabric-js.html">
+
+<dom-module id="google-drive">
+	<template>
+        <iron-ajax
+            id="saveWineToDrive"
+            handle-as="json"
+            processData="false"
+            on-response="_saveWineToDriveSuccess"
+            on-error="_saveWineToDriveError"
+            withCredentials="true">
+        </iron-ajax>
+        <fabric-js></fabric-js>
+	</template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'google-drive',
+                properties: {
+                    imageToUpload: {
+                        type: Object,
+                        reflectToAttribute: true,
+                        notify: true
+                    }
+            	},
+                _createImage: function() {
+
+                },
+                _saveWineToDriveSuccess: function(response) {
+                    console.log('response: ', response);
+                },
+                _saveWineToDriveError: function(error) {
+                    console.log('error: ', error);
+                },
+            	saveWine: function (imageToUpload, s, d, o) {
+                    console.log(imageToUpload);
+                    // var app = document.querySelector('my-app');
+                    // var token = app.getAuthToken();
+                    // this.$.saveWineToDrive.method = 'POST';
+                    // this.$.saveWineToDrive.url = 'https://www.googleapis.com/upload/drive/v2/files?uploadType=media';
+                    // this.$.saveWineToDrive.headers = {
+                    //     'Content-Type': imageToUpload.type,
+                    //     'Authorization': 'Bearer ' + token
+                    // }
+                    // this.$.saveWineToDrive.body = imageToUpload;
+                    // this.$.saveWineToDrive.generateRequest();
+            	},
+                getFiles: function() {
+                    // this.$.saveWineToDrive.method = 'GET';
+                    // this.$.saveWineToDrive.url = 'https://www.googleapis.com/drive/v3/files';
+                    // this.$.saveWineToDrive.headers = {
+                    //     'Content-Type': 'image/jpeg',
+                    //     'Authorization': 'Bearer ' + token
+                    // }
+                    // this.$.saveWineToDrive.generateRequest();
+                }
+            });
+        })();
+    </script>
+</dom-module>

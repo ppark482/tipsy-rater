@@ -1,0 +1,266 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="my-icons.html">
+
+<dom-module id="my-app">
+    <template>
+        <style>
+            :host {
+                --app-primary-color: #4285f4;
+                --app-secondary-color: black;
+
+                display: block;
+            }
+
+            app-header {
+                color: #fff;
+                background-color: var(--app-primary-color);
+            }
+            app-header paper-icon-button {
+                --paper-icon-button-ink-color: white;
+            }
+
+            .drawer-list {
+                margin: 0 20px;
+            }
+
+            .drawer-list a {
+                display: block;
+
+                padding: 0 16px;
+
+                text-decoration: none;
+
+                color: var(--app-secondary-color);
+
+                line-height: 40px;
+            }
+
+            .drawer-list a.iron-selected {
+                color: black;
+
+                font-weight: bold;
+            }
+        </style>
+
+        <app-location route="{{route}}"></app-location>
+        <app-route
+            route="{{route}}"
+            pattern="/:page"
+            data="{{routeData}}"
+            tail="{{subroute}}">
+        </app-route>
+        <app-route
+            route="{{subroute}}"
+            pattern="/:subpage"
+            data="{{subrouteData}}"
+            tail="{{subroute2}}">
+        </app-route>
+<!--         <app-route
+            route="{{subroute2}}"
+            pattern="/:id"
+            data="{{subrouteData2}}">
+        </app-route> -->
+
+        <app-drawer-layout fullbleed>
+            <!-- Drawer content -->
+            <app-drawer>
+                <app-toolbar>Menu</app-toolbar>
+                <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+                    <a name="login-page" href="/profile" drawer-toggle>My Profile</a>
+                    <a name="my-dashboard" href="/dashboard" drawer-toggle>Dashboard</a>
+                    <a name="wine-rater" href="/wine/snap" drawer-toggle>Wine Rater</a>
+                </iron-selector>
+            </app-drawer>
+
+            <!-- Main content -->
+            <app-header-layout has-scrolling-region>
+
+                <app-header condenses reveals effects="waterfall">
+                    <app-toolbar>
+                        <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+                        <div main-title>{{loggedInMessage}}</div>
+                    </app-toolbar>
+                </app-header>
+
+                <iron-pages
+                    id="routedPages"
+                    selected="[[routeData.page]]"
+                    attr-for-selected="name"
+                    fallback-selection="view404"
+                    role="main">
+                    <profile-view name="profile"
+                        active-route="[[route]]"
+                        page-name="{{pageName">
+                    </profile-view>
+                    <my-dashboard 
+                        name="dashboard" 
+                        active-route="[[route]]"
+                        page-name="{{pageName}}">
+                    </my-dashboard>
+                    <iron-pages
+                        name="wine"
+                        selected="[[subrouteData.subpage]]"
+                        attr-for-selected="subname">
+                        <wine-rater 
+                            subname="snap"
+                            active-route="[[route]]"
+                            page-name="{{pageName}}"
+                            image-to-upload="{{imageToUpload}}">
+                        </wine-rater>
+                        <wine-stats
+                            subname="stats"
+                            active-route="[[route]]"
+                            page-name="{{pageName}}"
+                            image-to-upload="{{imageToUpload}}">
+                        </wine-stats>
+                    </iron-pages>
+                    <my-view404 name="view404"></my-view404>
+                </iron-pages>
+            </app-header-layout>
+        </app-drawer-layout>
+    </template>
+
+    <script>
+        (function() {
+            Polymer({
+                is: 'my-app',
+
+                properties: {
+                    page: {
+                        type: String,
+                        reflectToAttribute: true,
+                        observer: '_pageChanged'
+                    },
+                    subpage: {
+                        type: String,
+                        notify: true,
+                        reflectToAttribute: true,
+                        observer: '_pageChanged'
+                    },
+                    pageName: {
+                        type: String,
+                        reflectToAttribute: true,
+                        notify: true
+                    },
+                    convertedRoutes: {
+                        type: Object,
+                        value: {
+                            profile: 'profile-view',
+                            dashboard: 'my-dashboard',
+                            wine: {
+                                snap: 'wine-rater',
+                                stats: 'wine-stats'
+                            }
+                        }
+                    },
+                    firstName: {
+                        type: String,
+                        notify: true
+                    },
+                    loggedInMessage: {
+                        type: String,
+                        notify: true,
+                        value: 'Not logged in'
+                    },
+                    imageToUpload: {
+                        type: Object,
+                        notify: true,
+                        reflectToAttribute: true
+                    }
+                },
+                observers: [
+                    '_routePageChanged(routeData.page)'
+                ],
+                _routePageChanged: function(page) {
+                    if (this.route.path === '/') {
+                        window.history.pushState({}, null, '/dashboard');
+                        window.dispatchEvent(new CustomEvent('location-changed'));
+                        return;
+                    }
+                    this.page = page || 'dashboard';
+                    if (this.subrouteData && this.subrouteData.subpage){
+                        this.subpage = this.subrouteData.subpage;
+                    } else {
+                        this.subpage = '';
+                    }
+                },
+                _pageChanged: function(page) {
+                    // Load page import on demand. Show 404 page if fails
+                    var resolvedPageUrl = this.resolveUrl(this._convertRoute() + '.html');
+                    this.importHref(resolvedPageUrl, null, this._showPage404, true);
+                },
+                _convertRoute: function () {
+                    if (this.route.path.split('/').length > 2) {
+                        return this.convertedRoutes[this.route.path.split('/')[1]][this.route.path.split('/')[2]];
+                    }
+                    return this.convertedRoutes[this.route.path.split('/')[1]];
+                },
+                _showPage404: function() {
+                    this.page = 'view404';
+                },
+                _setClosed: function() {
+                    // document.querySelector('app-drawer').classList.add('closeDrawer');
+                    // document.querySelector('app-header').classList.add('closeDrawer');
+                    // document.querySelector('app-drawer-layout').classList.add('closed');
+                },
+                removeUser: function() {
+                    localStorage.removeItem('google-user');
+                    this.firstName = '';
+                    // this.lastName = '';
+                    // this.profilePhoto = '';
+                    // this.email = '';
+                    this.setUser();
+
+                },
+                storeUser: function(user) {
+                    localStorage.setItem('google-user', JSON.stringify(user));
+                },
+                getUser: function() {
+                    return JSON.parse(localStorage.getItem('google-user'));
+                },
+                setUser: function() {
+                    var user = this.getUser();
+                    if (user) {
+                        this.firstName = user.w3.ofa;
+                        this.loggedInMessage = 'logged in as ' + this.firstName;
+                        // this.lastName = user.w3.wea;
+                        // this.profilePhoto = user.w3.Paa;
+                        // this.email = user.w3.U3;
+                    } else {
+                        this.loggedInMessage = 'not logged in';
+                    }
+                },
+                setAuthToken: function(token) {
+                    localStorage.setItem('google-token', token);
+                },
+                getAuthToken: function() {
+                    return localStorage.getItem('google-token');
+                },
+                attached: function() {
+                    this.setUser();
+                }
+            });
+        })();
+    </script>
+</dom-module>

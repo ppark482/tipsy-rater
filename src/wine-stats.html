@@ -1,0 +1,143 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/star-rating/star-rating.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="elements/google-drive.html">
+
+<dom-module id="wine-stats">
+    <template>
+        <style include="shared-styles">
+            :host {
+                @apply(--layout-fit);
+                overflow: hidden;
+                padding-top: 64px;
+            }
+
+            .rate-experience star-rating ::content .star-rating-wrapper > span {
+                width: 60px;
+            }
+
+            .rate-experience star-rating ::content .star-rating-wrapper > span paper-icon-button {
+                width: 60px;
+                height: 60px;
+            }
+
+            .rate-experience star-rating ::content .star-rating-wrapper > span.active,
+            .rate-experience star-rating ::content .star-rating-wrapper > span.active ~ span {
+                color: yellow;
+            }
+            .rate-experience star-rating ::content .star-rating-wrapper:hover > span.active,
+            .rate-experience star-rating ::content .star-rating-wrapper:hover > span.active ~ span {
+                opacity: 0.3;
+            }
+
+            .rate-experience star-rating ::content .star-rating-wrapper > span:hover,
+            .rate-experience star-rating ::content .star-rating-wrapper > span:hover ~ span,
+            .rate-experience star-rating ::content .star-rating-wrapper > span.active:hover ~ span {
+                color: yellow;
+            }
+
+            paper-card {
+                width: 100%;
+            }
+
+            paper-button {
+                width: 100%;
+                background-color: blue;
+                color: white;
+                margin: 0;
+            }
+        </style>
+        <div hidden$="{{submitting}}">
+            <paper-card heading="SWEETNESS">
+                <div class="card-actions">
+                    <star-rating rate="{{sweetRate}}"></star-rating>
+                </div>
+            </paper-card>
+
+            <paper-card heading="DRYNESS">
+                <div class="card-actions">
+                    <star-rating rate="{{dryRate}}"></star-rating>
+                </div>
+            </paper-card>
+
+            <paper-card heading="OVERALL">
+                <div class="card-actions">
+                    <star-rating rate="{{overallRate}}"></star-rating>
+                </div>
+            </paper-card>
+
+            <paper-button on-tap="_submitToGoogleDrive">SAVE WINE TO GOOGLE DRIVE</paper-button>
+        </div>
+        <google-drive></google-drive>
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'wine-stats',
+                properties: {
+                    activeRoute: {
+                        type: String,
+                        reflectToAttribute: true,
+                        observer: '_activeRoute'
+                    },
+                    imageToUpload: {
+                        type: Object,
+                        reflectToAttribute: true,
+                        notify: true
+                    },
+                    wineStats: {
+                        type: Object,
+                        notify: true
+                    },
+                    sweetRate: {
+                        type: Number,
+                        notify: true,
+                        value: 0,
+                        observer: '_ratingApplied'
+                    },
+                    dryRate: {
+                        type: Number,
+                        notify: true,
+                        value: 0,
+                        observer: '_ratingApplied'
+                    },
+                    overallRate: {
+                        type: Number,
+                        notify: true,
+                        value: 0,
+                        observer: '_ratingApplied'
+                    },
+                    submitting: {
+                        type: Boolean,
+                        notify: true,
+                        value: false
+                    }
+                },
+                _activeRoute: function (route) {
+                    // if (!this.imageToUpload) {
+                    //     window.history.pushState({}, null, '/wine/snap');
+                    //     window.dispatchEvent(new CustomEvent('location-changed'));
+                    // } else {
+                        if (route && route.path && route.path.split('/')[1] === 'wine' && route.path.split('/')[2] === 'stats') {
+                            this.pageName = 'Wine Stats';
+                            console.log('image upload: ', this.imageToUpload);
+                        }                        
+                    // }
+                },
+                _ratingApplied: function() {
+                    console.log('ratings', this.sweetRate, this.dryRate, this.overallRate);
+                },
+                _submitToGoogleDrive: function() {
+                    this.submitting = true;
+                    this.$$('google-drive').saveWine(this.imageToUpload, this.sweetRate, this.dryRate, this.overallRate);
+                }
+            });
+        })();
+    </script>
+</dom-module>

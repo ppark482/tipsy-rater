@@ -1,0 +1,22 @@
+<html><head><link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/google-signin/google-signin.html">
+
+<link rel="import" href="shared-styles.html">
+
+</head><body><dom-module id="login-page">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 10px;
+            }
+        </style>
+
+        <google-signin theme="dark" client-id="867389108662-ml3u1clb60k7oqam0bcai4bt207u88j0.apps.googleusercontent.com" scopes="https://www.googleapis.com/auth/drive" signed-in="{{signedIn}}">
+        </google-signin>
+        
+    </template>
+
+    <script>Polymer({is:"login-page",properties:{activeRoute:{type:String,reflectToAttribute:!0,observer:"_activeRoute"},signedIn:{type:Boolean,notify:!0}},listeners:{"google-signin-success":"_googleSignInSuccess"},_googleSignInSuccess:function(){document.querySelector("my-app").storeUser(gapi.auth2.getAuthInstance().currentUser.get()),document.querySelector("my-app").setUser(),this._activeRoute()},_activeRoute:function(e){this.signedIn&&(window.history.pushState({},null,"/dashboard"),window.dispatchEvent(new CustomEvent("location-changed")))}});</script>
+</dom-module>
+</body></html>
