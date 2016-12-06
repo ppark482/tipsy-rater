@@ -9,10 +9,11 @@
                 @apply(--layout-fit);
                 @apply(--layout-horizontal);
                 overflow: auto;
+                padding-top: 64px;
             }
         </style>
 
-        <canvas id="c" width="600" height="600" style="border:1px solid #aaa"></canvas>
+        <canvas id="c" style="border: 1px solid black;"></canvas>
 
     </template>
 
@@ -25,216 +26,73 @@
             Polymer({
                 is: 'fabric-js',
                 properties: {
-                    notDrawing: {
-                        type: Boolean,
-                        value: true,
+                    imageData: {
+                        type: Object,
+                        reflectToAttribute: true,
                         notify: true
                     },
-                    canDelete: {
-                        type: Boolean,
-                        value: false,
-                        notify: true
+                    sRate: {
+                        type: Number,
+                        notify: true,
+                        value: 0
                     },
-                    editText: {
-                        type: Boolean,
-                        value: false,
-                        notify: true
+                    dRate: {
+                        type: Number,
+                        notify: true,
+                        value: 0
                     },
-                    backgroundImage: {
+                    oRate: {
+                        type: Number,
+                        notify: true,
+                        value: 0
+                    },
+                    generatedImage: {
                         type: String,
-                        value: '',
-                        notify: true
-                    },
-                    drawingMode: {
-                        type: String,
-                        value: 'Pencil',
-                        notify: true
-                        // observer: "_drawMode"
+                        notify: true,
+                        reflectToAttribute: true
                     }
+                },
+                _generateRectangle: function(height, width, top) {
+                    height = 0.15 * height;
+                    var rect = new fabric.Rect({
+                        width: width,
+                        height: height,
+                        fill: 'white',
+                        top: top
+                    });
+                    return rect;
+                },
+                _generateText: function(top, height) {
+                    var str = 'S: ' + this.sRate + ' D: ' + this.dRate + ' O: ' + this.oRate;
+                    var text = new fabric.Text(str, {
+                        top: top + 20,
+                        fontSize: 20,
+                        left: 30
+                    });
+                    return text;
+                },
+                generateImage: function() {
+                    var viewportWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+                    var viewportHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+                    var canvas = new fabric.StaticCanvas('c');
+
+                    canvas.setDimensions({
+                        width: viewportWidth - (0.01 * viewportWidth),
+                        height: viewportHeight - (0.15 * viewportHeight)
+                    });
+
+                    var imageHeight;
+                    fabric.Image.fromURL(this.imageData, function(oImg) {
+                        oImg.scale(1);
+                        oImg.setWidth(canvas.width);
+                        // console.log(oImg);
+                        imageHeight = oImg.height;
+                        canvas.add(oImg);
+                        canvas.add(this._generateRectangle(canvas.height, canvas.width, imageHeight));
+                        canvas.add(this._generateText(imageHeight, canvas.height));
+                        this.generatedImage = canvas.toDataURL();
+                    }.bind(this));
                 }
-                // attached: function () {
-                //     canvas = this.__canvas = new fabric.Canvas('c');
-
-                //     canvas.on('object:selected', this._onObjectSelected);
-                //     canvas.on('selection:cleared', this._onSelectionCleared);
-
-                //     fabric.Object.prototype.transparentCorners = false;
-
-                //     var drawingColorEl = this.$$('#drawing-color'),
-                //         drawingLineWidthEl = this.$$('#drawing-line-width'),
-                //         textColor = this.$$('#text-color'),
-                //         textBgColor = this.$$('#text-bg-color'),
-                //         textSize = this.$$('#text-font-size');
-
-                //     drawingColorEl.onchange = function () {
-                //         canvas.freeDrawingBrush.color = this.value;
-                //     };
-                //     drawingLineWidthEl.onchange = function () {
-                //         canvas.freeDrawingBrush.width = parseInt(this.value, 10) || 1;
-                //     };
-                //     textColor.onchange = function () {
-                //         canvas.getActiveObject().setFill(this.value);
-                //         canvas.renderAll();
-                //     };
-                //     textBgColor.onchange = function () {
-                //         canvas.getActiveObject().setBackgroundColor(this.value);
-                //         canvas.renderAll();
-                //     };
-                //     textSize.onchange = function () {
-                //         canvas.getActiveObject().setFontSize(this.value);
-                //         canvas.renderAll();
-                //     };
-
-                //     if (canvas.freeDrawingBrush) {
-                //         canvas.freeDrawingBrush.color = drawingColorEl.value;
-                //         canvas.freeDrawingBrush.width = parseInt(drawingLineWidthEl.value, 10) || 1;
-                //         canvas.freeDrawingBrush.shadowBlur = 0;
-                //     }
-                // },
-                // load: function () {
-                //     canvas.clear();
-                //     canvas.isDrawingMode = false;
-
-                //     this.drawingMode = "Pencil";
-                //     this.notDrawing = true;
-                //     this.canDelete = false;
-                //     this.editText = false;
-
-                //     if (this.backgroundImage.length > 0) {
-                //         this._setBackground(this.backgroundImage);
-                //     } else {
-                //         canvas.setBackgroundColor('rgba(255,255,255, 1)', canvas.renderAll.bind(canvas));
-                //     }
-                // },
-                // _setBackground: function (image){
-                //     var self = this;
-                //     var img = new Image();
-                //     img.addEventListener("load", function(){
-                //         self._addBackground(this.naturalHeight, this.naturalWidth);
-                //     });
-                //     img.src = image;
-                // },
-                // _addBackground: function(nHeight, nWidth) {
-                //     fabric.Image.fromURL(this.backgroundImage, function(img) {
-                //         var oImg = img.set({left: 0, top: 0}).scale(1);
-                //         if(nHeight > nWidth) {
-                //             img.scaleToHeight(canvas.getHeight());
-                //         } else {
-                //             img.scaleToWidth(canvas.getWidth());
-                //         }
-                //         canvas.add(oImg).renderAll();
-                //     }, {crossOrigin: 'Anonymous', selectable: false, hoverCursor: 'default'});
-                // },
-                // _onObjectSelected: function (e) {
-                //     document.querySelector('fabric-js').canDelete = true;
-                //     document.querySelector('fabric-js').editText = e.target.get('type') === "i-text";
-                //     document.querySelector('.text-size-drawer').classList.remove("text-size-drawer-open");
-                //     document.querySelector('.line-size-drawer').classList.remove("line-size-drawer-open");
-                // },
-                // _onSelectionCleared: function () {
-                //     document.querySelector('fabric-js').canDelete = false;
-                //     document.querySelector('fabric-js').editText = false;
-                //     document.querySelector('.text-size-drawer').classList.remove("text-size-drawer-open");
-                //     document.querySelector('.line-size-drawer').classList.remove("line-size-drawer-open");
-                // },
-                // _drawMode: function (v) {
-                //     if(canvas) {
-                //         if (v === 'Pencil' || v === 'Circle' || v === 'Spray') {
-                //             canvas.freeDrawingBrush = new fabric[v + 'Brush'](canvas);
-                //         }
-
-                //         if (canvas.freeDrawingBrush) {
-                //             canvas.freeDrawingBrush.color = this.$$('#drawing-color').value;
-                //             canvas.freeDrawingBrush.width = parseInt(this.$$('#drawing-line-width').value, 10) || 1;
-                //         }
-                //     }
-                // },
-                // _addText: function () {
-                //     canvas.isDrawingMode = false;
-                //     var object = new fabric.IText('Tap and Type', {
-                //         left: 150,
-                //         top: 100,
-                //         fontFamily: "Arial",
-                //         fontSize: 24,
-                //         fill: '#000',
-                //         textAlign: "left"
-                //     });
-                //     canvas.add(object);
-                //     canvas.renderAll();
-                //     canvas.setActiveObject(object);
-                // },
-                // _addArrow: function () {
-                //     canvas.isDrawingMode = false;
-
-                //     fabric.Image.fromURL('images/arrow.png', function (image) {
-
-                //         image.set({
-                //             left: 50,
-                //             top: 50
-                //         })
-                //             .scale(0.20)
-                //             .setCoords();
-
-                //         canvas.add(image);
-                //         canvas.renderAll();
-                //         canvas.setActiveObject(image);
-                //     });
-
-                // },
-                // _textColor: function() {
-                //     this.$$('#text-color').click();
-                // },
-                // _textBgColor: function() {
-                //     this.$$('#text-bg-color').click();
-                // },
-                // _textSize: function () {
-                //     this.$$('.text-size-drawer').classList.toggle("text-size-drawer-open");
-                // },
-                // _lineSize: function () {
-                //     this.$$('.line-size-drawer').classList.toggle("line-size-drawer-open");
-                // },
-                // _lineColor: function () {
-                //     this.$$('#drawing-color').click();
-                // },
-                // _enterDrawing: function () {
-                //     document.querySelector('fabric-js').editText = false;
-                //     document.querySelector('fabric-js').canDelete = false;
-                //     document.querySelector('.text-size-drawer').classList.remove("text-size-drawer-open");
-                //     document.querySelector('.line-size-drawer').classList.remove("line-size-drawer-open");
-                //     this.notDrawing = false;
-                //     canvas.isDrawingMode = true;
-                //     canvas.deactivateAll();
-                //     canvas.renderAll();
-                // },
-                // _exitDrawing: function () {
-                //     this.notDrawing = true;
-                //     canvas.isDrawingMode = false;
-                // },
-                // _clearCanvas: function () {
-                //     canvas.clear();
-                //     if (this.backgroundImage.length > 0) {
-                //         this._setBackground(this.backgroundImage);
-                //     } else {
-                //         canvas.setBackgroundColor('rgba(255,255,255, 1)', canvas.renderAll.bind(canvas));
-                //     }
-                // },
-                // _deleteSelected: function () {
-                //     if (canvas.getActiveGroup()) {
-                //         canvas.getActiveGroup().forEachObject(function (o) {
-                //             canvas.remove(o);
-                //         });
-                //         canvas.discardActiveGroup().renderAll();
-                //     } else {
-                //         canvas.remove(canvas.getActiveObject());
-                //     }
-                // },
-                // getCanvas:function () {
-                //     return canvas.toDataURL("image/jpeg");
-                // },
-                // clearCanvas: function () {
-                //     canvas.clear();
-                //     this._exitDrawing();
-                // }
             });
         })();
     </script>

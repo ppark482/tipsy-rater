@@ -88,7 +88,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <app-toolbar>Menu</app-toolbar>
                 <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
                     <a name="login-page" href="/profile" drawer-toggle>My Profile</a>
-                    <a name="my-dashboard" href="/dashboard" drawer-toggle>Dashboard</a>
+                    <!-- <a name="my-dashboard" href="/dashboard" drawer-toggle>Dashboard</a> -->
                     <a name="wine-rater" href="/wine/snap" drawer-toggle>Wine Rater</a>
                 </iron-selector>
             </app-drawer>
@@ -126,13 +126,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             subname="snap"
                             active-route="[[route]]"
                             page-name="{{pageName}}"
-                            image-to-upload="{{imageToUpload}}">
+                            image-to-upload="{{imageToUpload}}"
+                            image-data="{{imageData}}">
                         </wine-rater>
                         <wine-stats
                             subname="stats"
                             active-route="[[route]]"
                             page-name="{{pageName}}"
-                            image-to-upload="{{imageToUpload}}">
+                            image-to-upload="{{imageToUpload}}"
+                            image-data="{{imageData}}">
                         </wine-stats>
                     </iron-pages>
                     <my-view404 name="view404"></my-view404>

@@ -56,7 +56,6 @@
         <div class="fit layout vertical" style="padding-top:64px;width:100%;">
             <input id="file" type="file" name="file" accept="image/*" capture on-change="_handleImage" class="custom-file-input" hidden$="{{previewing}}">
             <img id="previewImage">
-            <paper-button on-tap="_rateThisWine" hidden$="{{!previewing}}">RATE THIS WINE</paper-button>
         </div>
     </template>
 
@@ -72,15 +71,11 @@
                         reflectToAttribute: true,
                         observer: '_activeRoute'
                     },
-                    previewing: {
-                        type: Boolean,
-                        notify: true,
-                        value: false
-                    },
                     imageToUpload: {
-                        type: Object,
+                        type: String,
                         reflectToAttribute: true,
-                        notify: true
+                        notify: true,
+                        observer: '_checkForFileReady'
                     }
                 },
                 _activeRoute: function (route) {
@@ -88,21 +83,6 @@
                         this.pageName = 'Wine';
                     }
                 },
-                // _dataURItoBlob: function(dataURI) {
-                //     var byteString;
-                //     if (dataURI.split(',')[0].indexOf('base64') >= 0) {
-                //         byteString = atob(dataURI.split(',')[1]);
-                //     } else {
-                //         byteString = unescape(dataURI.split(',')[1]);
-                //     }
-                //     var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-                //     // write the bytes of the string to a typed array
-                //     var ia = new Uint8Array(byteString.length);
-                //     for (var i = 0; i < byteString.length; i++) {
-                //         ia[i] = byteString.charCodeAt(i);
-                //     }
-                //     return new Blob([ia], {type:mimeString});
-                // },
                 _handleImage: function(e) {
                     var img = this.$.previewImage;
                     var imageFile;
@@ -118,27 +98,15 @@
                         crop: false,
                         quality: 80,
                         rotate: 0,
-                        callback: function(data, width, height, file) {
+                        callback: function(data) {
                             img.src = data;
-                            self.imageData = data;
-                            self.imageToUpload = file;
-                            // console.log('image to upload: ', self.imageToUpload);
-                            self.previewing = true;
+                            self.set('imageToUpload', data);
+                            self.$.previewImage.src = '';
                         }
                     });
-                    // var reader = new FileReader();
-                    // reader.onload = (function(aImg) {
-                    //     return function(e) {
-                    //         aImg.src = e.target.result;
-                    //     }; })(img);
-                    // reader.readAsDataURL(imageFile);
                 },
-                _rateThisWine: function(e) {
+                _checkForFileReady: function() {
                     if (this.imageToUpload) {
-                        this.previewing = false;
-                        this.$.previewImage.src = '';
-
-                        e.preventDefault();
                         window.history.pushState({}, null, '/wine/stats');
                         window.dispatchEvent(new CustomEvent('location-changed'));
                     }

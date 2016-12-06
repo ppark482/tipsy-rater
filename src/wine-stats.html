@@ -58,21 +58,26 @@
                 </div>
             </paper-card>
 
-            <paper-card heading="DRYNESS">
+            <paper-card heading="DRYNESS" hidden$="{{!sweetRate}}">
                 <div class="card-actions">
                     <star-rating rate="{{dryRate}}"></star-rating>
                 </div>
             </paper-card>
 
-            <paper-card heading="OVERALL">
+            <paper-card heading="OVERALL" hidden$="{{!dryRate}}">
                 <div class="card-actions">
                     <star-rating rate="{{overallRate}}"></star-rating>
                 </div>
             </paper-card>
 
-            <paper-button on-tap="_submitToGoogleDrive">SAVE WINE TO GOOGLE DRIVE</paper-button>
+            <paper-button on-tap="_submitToGoogleDrive" hidden$="{{!overallRate}}">SAVE WINE TO GOOGLE DRIVE</paper-button>
         </div>
-        <google-drive></google-drive>
+        <google-drive 
+            image-to-upload="[[imageToUpload]]"
+            sweet-rate="[[sweetRate]]"
+            dry-rate="[[dryRate]]"
+            overall-rate="[[overallRate]]">
+        </google-drive>
     </template>
     <script>
         (function() {
@@ -126,16 +131,15 @@
                     // } else {
                         if (route && route.path && route.path.split('/')[1] === 'wine' && route.path.split('/')[2] === 'stats') {
                             this.pageName = 'Wine Stats';
-                            console.log('image upload: ', this.imageToUpload);
-                        }                        
-                    // }
+                        }
+                    // }                     
                 },
                 _ratingApplied: function() {
-                    console.log('ratings', this.sweetRate, this.dryRate, this.overallRate);
+                    // console.log('ratings', this.sweetRate, this.dryRate, this.overallRate);
                 },
                 _submitToGoogleDrive: function() {
                     this.submitting = true;
-                    this.$$('google-drive').saveWine(this.imageToUpload, this.sweetRate, this.dryRate, this.overallRate);
+                    this.$$('google-drive').saveWine();
                 }
             });
         })();

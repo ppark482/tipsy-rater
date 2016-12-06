@@ -14,7 +14,14 @@
             on-error="_saveWineToDriveError"
             withCredentials="true">
         </iron-ajax>
-        <fabric-js></fabric-js>
+        <fabric-js
+            hidden$="[[!showCanvas]]"
+            image-data="[[imageToUpload]]" 
+            s-rate="[[sweetRate]]"
+            d-rate="[[dryRate]]"
+            o-rate="[[overallRate]]"
+            generated-image="{{generatedImage}}">
+        </fabric-js>
 	</template>
     <script>
         (function() {
@@ -27,19 +34,88 @@
                         type: Object,
                         reflectToAttribute: true,
                         notify: true
+                    },
+                    sweetRate: {
+                        type: Number,
+                        notify: true,
+                        value: 0
+                    },
+                    dryRate: {
+                        type: Number,
+                        notify: true,
+                        value: 0
+                    },
+                    overallRate: {
+                        type: Number,
+                        notify: true,
+                        value: 0
+                    },
+                    showCanvas: {
+                        type: Boolean,
+                        notify: true,
+                        value: false
+                    },
+                    generatedImage: {
+                        type: String,
+                        notify: true,
+                        value: '',
+                        observer: '_sendToDrive'
                     }
             	},
                 _createImage: function() {
-
+                    this.querySelector('fabric-js').generateImage();
                 },
                 _saveWineToDriveSuccess: function(response) {
                     console.log('response: ', response);
+                    this.generatedImage = '';
                 },
                 _saveWineToDriveError: function(error) {
                     console.log('error: ', error);
+                    this.generatedImage = '';
                 },
-            	saveWine: function (imageToUpload, s, d, o) {
-                    console.log(imageToUpload);
+                _dataURItoBlob: function(dataURI) {
+                    // convert base64/URLEncoded data component to raw binary data held in a string
+                    var byteString;
+                    if (dataURI.split(',')[0].indexOf('base64') >= 0) {
+                        byteString = atob(dataURI.split(',')[1]);
+                    } else {
+                        byteString = unescape(dataURI.split(',')[1]);
+                    }
+
+                    // separate out the mime component
+                    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+                    // write the bytes of the string to a typed array
+                    var ia = new Uint8Array(byteString.length);
+                    for (var i = 0; i < byteString.length; i++) {
+                        ia[i] = byteString.charCodeAt(i);
+                    }
+
+                    return new Blob([ia], {type:mimeString});
+                },
+                _sendToDrive: function() {
+                    if (this.generatedImage && this.generatedImage.length > 0) {
+                        var imageToUpload = this._dataURItoBlob(this.generatedImage);
+                        var app = document.querySelector('my-app');
+                        var token = app.getAuthToken();
+                        this.$.saveWineToDrive.method = 'POST';
+                        this.$.saveWineToDrive.url = 'https://www.googleapis.com/upload/drive/v2/files?uploadType=media';
+                        this.$.saveWineToDrive.headers = {
+                            'Content-Type': imageToUpload.type,
+                            'Authorization': 'Bearer ' + token
+                        }
+                        this.$.saveWineToDrive.body = imageToUpload;
+                        this.$.saveWineToDrive.generateRequest();
+                    }
+                },
+            	saveWine: function () {
+                    // console.log('s ready: ', this.sweetRate);
+                    // console.log('d ready: ', this.dryRate);
+                    // console.log('o ready: ', this.overallRate);
+                    // console.log('ready from google: ', this.imageToUpload);
+                    // this.showCanvas = true;
+                    this._createImage();
+
                     // var app = document.querySelector('my-app');
                     // var token = app.getAuthToken();
                     // this.$.saveWineToDrive.method = 'POST';
