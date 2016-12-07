@@ -68,12 +68,14 @@
                 _saveWineToDriveSuccess: function(response) {
                     console.log('response: ', response);
                     this.generatedImage = '';
+                    this.imageToUpload = '';
                     window.history.pushState({}, null, '/wine/snap');
                     window.dispatchEvent(new CustomEvent('location-changed'));
                 },
                 _saveWineToDriveError: function(error) {
                     console.log('error: ', error);
                     this.generatedImage = '';
+                    this.imageToUpload = '';
                     window.history.pushState({}, null, '/wine/snap');
                     window.dispatchEvent(new CustomEvent('location-changed'));
                 },

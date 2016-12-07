@@ -13,31 +13,35 @@
             :host {
                 @apply(--layout-fit);
                 overflow: hidden;
-                padding-top: 64px;
+                padding-top: 32px;
             }
 
-            .rate-experience star-rating ::content .star-rating-wrapper > span {
-                width: 60px;
+            star-rating ::content .star-rating-wrapper {
+                width: 100%;
             }
 
-            .rate-experience star-rating ::content .star-rating-wrapper > span paper-icon-button {
-                width: 60px;
-                height: 60px;
+            star-rating ::content .star-rating-wrapper > span {
+                width: 50px;
             }
 
-            .rate-experience star-rating ::content .star-rating-wrapper > span.active,
-            .rate-experience star-rating ::content .star-rating-wrapper > span.active ~ span {
-                color: yellow;
+            star-rating ::content .star-rating-wrapper > span paper-icon-button {
+                width: 50px;
+                height: 50px;
             }
-            .rate-experience star-rating ::content .star-rating-wrapper:hover > span.active,
-            .rate-experience star-rating ::content .star-rating-wrapper:hover > span.active ~ span {
+
+            star-rating ::content .star-rating-wrapper > span.active,
+            star-rating ::content .star-rating-wrapper > span.active ~ span {
+                color: var(--color-peach);
+            }
+            star-rating ::content .star-rating-wrapper:hover > span.active,
+            star-rating ::content .star-rating-wrapper:hover > span.active ~ span {
                 opacity: 0.3;
             }
 
-            .rate-experience star-rating ::content .star-rating-wrapper > span:hover,
-            .rate-experience star-rating ::content .star-rating-wrapper > span:hover ~ span,
-            .rate-experience star-rating ::content .star-rating-wrapper > span.active:hover ~ span {
-                color: yellow;
+            star-rating ::content .star-rating-wrapper > span:hover,
+            star-rating ::content .star-rating-wrapper > span:hover ~ span,
+            star-rating ::content .star-rating-wrapper > span.active:hover ~ span {
+                color: var(--color-peach);
             }
 
             paper-card {
@@ -46,31 +50,50 @@
 
             paper-button {
                 width: 100%;
-                background-color: blue;
-                color: white;
                 margin: 0;
+                position: absolute;
+                bottom: 0;
+                height: 65px;
+                border-radius: 0;
+                background-color: var(--color-peach);
+                font-size: 28px;
             }
+
+            .rater {
+
+            }
+
+            .rater > p {
+                margin: 15px auto;
+                padding-left: 40px;
+                font-size: 20px;
+                color: var(--color-purple);
+            }
+
+            .rater > p > span {
+                font-family: 'Fjalla One', sans-serif;
+                font-size: 45px;
+                color: var(--color-magenta);
+            }
+
         </style>
-        <div hidden$="{{submitting}}">
-            <paper-card heading="SWEETNESS">
-                <div class="card-actions">
-                    <star-rating rate="{{sweetRate}}"></star-rating>
-                </div>
-            </paper-card>
+        <div>
+            <div class="rater">
+                <p>rate <span>SWEETNESS</span></p>
+                <star-rating id="sweetRate" rate="{{sweetRate}}"></star-rating>
+            </div>
 
-            <paper-card heading="DRYNESS" hidden$="{{!sweetRate}}">
-                <div class="card-actions">
-                    <star-rating rate="{{dryRate}}"></star-rating>
-                </div>
-            </paper-card>
+            <div class="rater" hidden$="{{!sweetRate}}">
+                <p>rate <span>DRYNESS</span></p>
+                <star-rating id="dryRate" rate="{{dryRate}}"></star-rating>
+            </div>
 
-            <paper-card heading="OVERALL" hidden$="{{!dryRate}}">
-                <div class="card-actions">
-                    <star-rating rate="{{overallRate}}"></star-rating>
-                </div>
-            </paper-card>
+            <div class="rater" hidden$="{{!dryRate}}">
+                <p>rate <span>OVERALL</span></p>
+                <star-rating id="overallRate" rate="{{overallRate}}"></star-rating>
+            </div>
 
-            <paper-button on-tap="_submitToGoogleDrive" hidden$="{{!overallRate}}">SAVE WINE TO GOOGLE DRIVE</paper-button>
+            <paper-button on-tap="_submitToGoogleDrive" hidden$="{{!overallRate}}">SAVE WINE</paper-button>
         </div>
         <google-drive 
             image-to-upload="[[imageToUpload]]"
@@ -103,20 +126,20 @@
                     sweetRate: {
                         type: Number,
                         notify: true,
-                        value: 0,
-                        observer: '_ratingApplied'
+                        reflectToAttribute: true,
+                        value: 0
                     },
                     dryRate: {
                         type: Number,
                         notify: true,
-                        value: 0,
-                        observer: '_ratingApplied'
+                        reflectToAttribute: true,
+                        value: 0
                     },
                     overallRate: {
                         type: Number,
                         notify: true,
-                        value: 0,
-                        observer: '_ratingApplied'
+                        reflectToAttribute: true,
+                        value: 0
                     },
                     submitting: {
                         type: Boolean,
@@ -131,8 +154,11 @@
                     // } else {
                         if (route && route.path && route.path.split('/')[1] === 'wine' && route.path.split('/')[2] === 'stats') {
                             this.pageName = 'Wine Stats';
+                            this.querySelector('#sweetRate').clear();
+                            this.querySelector('#dryRate').clear();
+                            this.querySelector('#overallRate').clear();
                         }
-                    // }                     
+                    // }                 
                 },
                 _ratingApplied: function() {
                     // console.log('ratings', this.sweetRate, this.dryRate, this.overallRate);

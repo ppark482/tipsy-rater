@@ -22,6 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="my-icons.html">
 <link rel="import" href="profile-view.html">
+<link rel="import" href="wine-stats.html">
 
 <dom-module id="my-app">
     <template>
@@ -29,6 +30,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             :host {
                 --app-primary-color: #4285f4;
                 --app-secondary-color: black;
+                --color-purple: #450920;
+                --color-magenta: #A53860;
+                --color-peach: #FF7472;
+                --color-pink: #FFA5AB;
+                --color-beige: #F9DBBD;
 
                 display: block;
             }
@@ -96,13 +102,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             <!-- Main content -->
             <app-header-layout has-scrolling-region>
-
+<!-- 
                 <app-header condenses reveals effects="waterfall">
                     <app-toolbar>
-                        <paper-icon-button icon="menu" drawer-toggle></paper-icon-button style="display:none;">
+                        <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
                         <div main-title>{{loggedInMessage}}</div>
                     </app-toolbar>
-                </app-header>
+                </app-header> -->
 
                 <iron-pages
                     id="routedPages"
@@ -221,11 +227,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 _showPage404: function() {
                     this.page = 'view404';
-                },
-                _setClosed: function() {
-                    // document.querySelector('app-drawer').classList.add('closeDrawer');
-                    // document.querySelector('app-header').classList.add('closeDrawer');
-                    // document.querySelector('app-drawer-layout').classList.add('closed');
                 },
                 removeUser: function() {
                     localStorage.removeItem('google-user');

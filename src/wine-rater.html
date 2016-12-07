@@ -29,37 +29,47 @@
             #previewImage {
                 max-height: 350px;
                 max-width: 350px;
+                display: block;
+                margin: 0 auto;
             }
             .custom-file-input::-webkit-file-upload-button {
                 visibility: hidden;
             }
             .custom-file-input::before {
-                content: 'TAKE PIC';
+                content: 'TOUCH ME';
                 font-family: 'Fjalla One', sans-serif;
                 display: block;
                 background: white;
-                border: 1px solid #999;
                 border-radius: 0;
-                padding: 40px 107px;
+                padding: 150px 107px;
                 outline: none;
                 white-space: nowrap;
                 -webkit-user-select: none;
                 cursor: pointer;
                 text-shadow: 1px 1px #fff;
                 font-weight: 700;
-                font-size: 18px;
-                color: black;
+                font-size: 24px;
+                color: var(--color-purple);
             }
             .custom-file-input:hover::before {
                 border-color: black;
             }
             .custom-file-input:active::before {
             }
+            .good-button {
+                font-size: 24px;
+                margin: 0;
+                margin-top: 10px;
+                width: 100%;
+                padding-bottom: 100%;
+            }
         </style>
 
-        <div class="fit layout vertical" style="padding-top:64px;width:100%;">
+        <div class="fit layout vertical" style="width:100%;">
+            <p class="card instructions">take a picture of the wine label</p>
             <input id="file" type="file" name="file" accept="image/*" capture on-change="_handleImage" class="custom-file-input" hidden$="{{previewing}}">
-            <img id="previewImage">
+            <img id="previewImage" hidden$="{{!previewing}}">
+            <paper-button class="good-button" hidden$="{{!previewing}}" on-tap="_toWineStats">touch me again</paper-button>
         </div>
     </template>
 
@@ -78,8 +88,12 @@
                     imageToUpload: {
                         type: String,
                         reflectToAttribute: true,
+                        notify: true
+                    },
+                    previewing: {
+                        type: Boolean,
                         notify: true,
-                        observer: '_checkForFileReady'
+                        value: false
                     }
                 },
                 _activeRoute: function (route) {
@@ -107,15 +121,16 @@
                         callback: function(data) {
                             img.src = data;
                             self.set('imageToUpload', data);
-                            self.$.previewImage.src = '';
+                            self.previewing = true;
+                            // self.$.previewImage.src = '';
+                            // self._toWineStats();
                         }
                     });
                 },
-                _checkForFileReady: function() {
-                    if (this.imageToUpload) {
-                        window.history.pushState({}, null, '/wine/stats');
-                        window.dispatchEvent(new CustomEvent('location-changed'));
-                    }
+                _toWineStats: function() {
+                    this.previewing = false;
+                    window.history.pushState({}, null, '/wine/stats');
+                    window.dispatchEvent(new CustomEvent('location-changed'));
                 }
             });
         })();

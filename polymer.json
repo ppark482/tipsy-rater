@@ -5,7 +5,6 @@
     "src/my-dashboard.html",
     "src/wine-rater.html",
     "src/my-view404.html",
-    "src/wine-stats.html",
     "src/elements/google-drive.html"
   ],
   "sourceGlobs": [
