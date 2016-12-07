@@ -68,10 +68,14 @@
                 _saveWineToDriveSuccess: function(response) {
                     console.log('response: ', response);
                     this.generatedImage = '';
+                    window.history.pushState({}, null, '/wine/snap');
+                    window.dispatchEvent(new CustomEvent('location-changed'));
                 },
                 _saveWineToDriveError: function(error) {
                     console.log('error: ', error);
                     this.generatedImage = '';
+                    window.history.pushState({}, null, '/wine/snap');
+                    window.dispatchEvent(new CustomEvent('location-changed'));
                 },
                 _dataURItoBlob: function(dataURI) {
                     // convert base64/URLEncoded data component to raw binary data held in a string

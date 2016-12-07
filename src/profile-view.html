@@ -11,6 +11,10 @@
                 display: block;
                 padding: 10px;
             }
+
+            p.card {
+                font-size: 18px;
+            }
         </style>
         <iron-ajax
             id="checkAuthToken"
@@ -20,14 +24,18 @@
             on-error="_authTokenError"
             withCredentials="true">
         </iron-ajax>
-        <h2>Google signin necessary to save images to your google drive.</h2>
-        <google-signin 
-            theme="dark" 
-            client-id="867389108662-ml3u1clb60k7oqam0bcai4bt207u88j0.apps.googleusercontent.com" 
-            scopes="https://www.googleapis.com/auth/drive"
-            signed-in="{{signedIn}}">
-        </google-signin>
-        
+        <div class="card">
+            <p>Google signin necessary to save images to your google drive.</p>
+            <google-signin 
+                class="flex"
+                raised
+                width="wide"
+                theme="dark" 
+                client-id="867389108662-ml3u1clb60k7oqam0bcai4bt207u88j0.apps.googleusercontent.com" 
+                scopes="https://www.googleapis.com/auth/drive"
+                signed-in="{{signedIn}}">
+            </google-signin>
+        </div>
     </template>
 
     <script>
