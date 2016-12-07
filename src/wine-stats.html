@@ -65,9 +65,9 @@
 
             .rater > p {
                 margin: 15px auto;
-                padding-left: 40px;
                 font-size: 20px;
                 color: var(--color-purple);
+                text-align: center;
             }
 
             .rater > p > span {
@@ -93,7 +93,7 @@
                 <star-rating id="overallRate" rate="{{overallRate}}"></star-rating>
             </div>
 
-            <paper-button on-tap="_submitToGoogleDrive" hidden$="{{!overallRate}}">SAVE WINE</paper-button>
+            <paper-button id="saveButton" on-tap="_submitToGoogleDrive" hidden$="{{!overallRate}}">SAVE WINE</paper-button>
         </div>
         <google-drive 
             image-to-upload="[[imageToUpload]]"
@@ -157,6 +157,7 @@
                             this.querySelector('#sweetRate').clear();
                             this.querySelector('#dryRate').clear();
                             this.querySelector('#overallRate').clear();
+                            this.querySelector('#saveButton').disabled = false;
                         }
                     // }                 
                 },
@@ -164,6 +165,7 @@
                     // console.log('ratings', this.sweetRate, this.dryRate, this.overallRate);
                 },
                 _submitToGoogleDrive: function() {
+                    this.querySelector('#saveButton').disabled = true;
                     this.submitting = true;
                     this.$$('google-drive').saveWine();
                 }

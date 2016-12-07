@@ -10,10 +10,11 @@
                 @apply(--layout-horizontal);
                 overflow: auto;
                 padding-top: 64px;
+                color: white;
             }
         </style>
 
-        <canvas id="c" style="border: 1px solid black;"></canvas>
+        <canvas id="c"></canvas>
 
     </template>
 
@@ -50,24 +51,42 @@
                         type: String,
                         notify: true,
                         reflectToAttribute: true
+                    },
+                    space: {
+                        type: String,
+                        value: '               '
                     }
                 },
-                _generateRectangle: function(height, width, top) {
-                    height = 0.15 * height;
+                _generateRectangle: function(canvasHeight, canvasWidth, imageHeight) {
                     var rect = new fabric.Rect({
-                        width: width,
-                        height: height,
-                        fill: 'white',
-                        top: top
+                        width: canvasWidth + 1,
+                        height: (canvasHeight - imageHeight) + 1,
+                        // fill: '#450920',
+                        fill: '#A53860',
+                        top: imageHeight - 1,
+                        left: -1
                     });
                     return rect;
                 },
-                _generateText: function(top, height) {
-                    var str = 'S: ' + this.sRate + ' D: ' + this.dRate + ' O: ' + this.oRate;
+                _generateLabels: function(imageHeight) {
+                    var str = 'sweetness:' + this.space + 'dryness:' + this.space + 'overall:' + this.space;
                     var text = new fabric.Text(str, {
-                        top: top + 20,
-                        fontSize: 20,
-                        left: 30
+                        fontFamily: 'Fjalla One',
+                        top: imageHeight + 13,
+                        fontSize: 12,
+                        left: 30,
+                        fill: 'white'
+                    });
+                    return text;
+                },
+                _generateRatings: function(imageHeight) {
+                    var str = this.sRate + '        ' + this.dRate + '        ' + this.oRate;
+                    var text = new fabric.Text(str, {
+                        fontFamily: 'Raleway',
+                        top: imageHeight + 6,
+                        fontSize: 30,
+                        left: 90,
+                        fill: 'white'
                     });
                     return text;
                 },
@@ -76,20 +95,19 @@
                     var viewportHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
                     var canvas = new fabric.StaticCanvas('c');
 
-                    canvas.setDimensions({
-                        width: viewportWidth - (0.01 * viewportWidth),
-                        height: viewportHeight - (0.15 * viewportHeight)
-                    });
-
                     var imageHeight;
                     fabric.Image.fromURL(this.imageData, function(oImg) {
-                        oImg.scale(1);
-                        oImg.setWidth(canvas.width);
+                        // oImg.setWidth(canvas.width);
                         // console.log(oImg);
                         imageHeight = oImg.height;
+                        canvas.setDimensions({
+                            width: oImg.width,
+                            height: oImg.height + 50
+                        });
                         canvas.add(oImg);
                         canvas.add(this._generateRectangle(canvas.height, canvas.width, imageHeight));
-                        canvas.add(this._generateText(imageHeight, canvas.height));
+                        canvas.add(this._generateLabels(imageHeight));
+                        canvas.add(this._generateRatings(imageHeight));
                         this.generatedImage = canvas.toDataURL();
                     }.bind(this));
                 }

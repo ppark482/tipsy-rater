@@ -952,7 +952,7 @@ var EXIF = (function() {
                     newctx = newcanvas.getContext('2d');
                     newctx.drawImage(canvas, x, y, width, height);
 
-                    console.log(file, file.type);
+                    // console.log(file, file.type);
                     if (file.type === "image/png") {
                         var data = newcanvas.toDataURL(file.type);
                     } else {

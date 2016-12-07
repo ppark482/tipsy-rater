@@ -39,14 +39,13 @@
                 content: 'TOUCH ME';
                 font-family: 'Fjalla One', sans-serif;
                 display: block;
-                background: white;
+                background: HSLA(0, 0%, 0%, 0);
                 border-radius: 0;
                 padding: 150px 107px;
                 outline: none;
                 white-space: nowrap;
                 -webkit-user-select: none;
                 cursor: pointer;
-                text-shadow: 1px 1px #fff;
                 font-weight: 700;
                 font-size: 24px;
                 color: var(--color-purple);
@@ -104,6 +103,8 @@
                     }
                 },
                 _handleImage: function(e) {
+                    var app = document.querySelector('my-app');
+                    app.spinner(true);
                     var img = this.$.previewImage;
                     var imageFile;
                     var self = this;
@@ -113,17 +114,14 @@
                         imageFile = e.target.files[0];
                     }
                     canvasResize(imageFile, {
-                        width: 300,
-                        height: 0,
                         crop: false,
-                        quality: 80,
+                        quality: 200,
                         rotate: 0,
                         callback: function(data) {
                             img.src = data;
                             self.set('imageToUpload', data);
                             self.previewing = true;
-                            // self.$.previewImage.src = '';
-                            // self._toWineStats();
+                            app.spinner(false);
                         }
                     });
                 },
