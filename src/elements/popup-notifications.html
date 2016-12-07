@@ -1,0 +1,56 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+
+<dom-module id="popup-notifications">
+    <style include="shared-styles">
+        paper-toast {
+            font-family: 'Fjalla One', sans-serif;
+            font-size: 20px;
+
+        }
+        .success {
+            --paper-toast-background-color: var(--color-magenta);
+            --paper-toast-color: var(--color-beige);
+            height: 60px;
+            text-transform: uppercase;
+        }
+        .error {
+            --paper-toast-background-color: red;
+            --paper-toast-color: white;
+            height: 85px;
+            text-transform: none;
+        }
+    </style>
+    <template>
+        <paper-toast 
+            id="successSavingWine"
+            class="success"
+            duration="3000"
+            text="Wine saved!">
+        </paper-toast>
+        <paper-toast 
+            id="errorSavingWine"
+            class="error"
+            duration="5000"
+            text="error saving wine, can you try again?">
+        </paper-toast>
+        <!-- Uncomment next block to enable Service Worker support (2/2) -->
+        <!--
+        <paper-toast id="caching-complete"
+                     duration="6000"
+                     text="Caching complete! This app will work offline.">
+        </paper-toast>
+        -->
+
+    </template>
+    <script>
+        (function () {
+            Polymer({
+                is: 'popup-notifications',
+                show: function (id) {
+                    this.$$('#' + id).show();
+                }
+            });
+        })();
+    </script>
+</dom-module>

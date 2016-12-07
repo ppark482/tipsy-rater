@@ -79,7 +79,8 @@
                     }
                 },
                 _authTokenError: function(e) {
-                    document.querySelector('my-app').setAuthToken('');
+                    // this.$$('google-signin').signOut();
+                    this._handleGoogleSignedOut();
                     window.history.pushState({}, null, '/profile');
                     window.dispatchEvent(new CustomEvent('location-changed'));
                 },

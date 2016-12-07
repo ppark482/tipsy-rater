@@ -66,14 +66,16 @@
                     this.querySelector('fabric-js').generateImage();
                 },
                 _saveWineToDriveSuccess: function(response) {
-                    console.log('response: ', response);
+                    document.querySelector('my-app').showNotification('successSavingWine');
+                    document.querySelector('my-app').spinner(false);
                     this.generatedImage = '';
                     this.imageToUpload = '';
                     window.history.pushState({}, null, '/wine/snap');
                     window.dispatchEvent(new CustomEvent('location-changed'));
                 },
                 _saveWineToDriveError: function(error) {
-                    console.log('error: ', error);
+                    document.querySelector('my-app').showNotification('errorSavingWine');
+                    document.querySelector('my-app').spinner(false);
                     this.generatedImage = '';
                     this.imageToUpload = '';
                     window.history.pushState({}, null, '/wine/snap');
@@ -112,6 +114,7 @@
                         }
                         this.$.saveWineToDrive.body = imageToUpload;
                         this.$.saveWineToDrive.generateRequest();
+                        app.spinner(true);
                     }
                 },
             	saveWine: function () {

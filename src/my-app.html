@@ -20,9 +20,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="my-icons.html">
 <link rel="import" href="profile-view.html">
 <link rel="import" href="wine-stats.html">
+<link rel="import" href="elements/popup-notifications.html">
 
 <dom-module id="my-app">
     <template>
@@ -68,6 +70,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 font-weight: bold;
             }
+
+            paper-spinner {
+                --paper-spinner-layer-1-color: var(--color-purple);
+                --paper-spinner-layer-2-color: var(--color-magenta);
+                --paper-spinner-layer-3-color: var(--color-peach);
+                --paper-spinner-layer-4-color: var(--color-pink);
+                --paper-spinner-stroke-width: 3px;
+                z-index: 10;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+            }
+
+            #overlay {
+                width: 100vw;
+                height: 100vh;
+                background-color: HSLA(228, 4%, 23%, 0.4);
+                display: block;
+                z-index: 9;
+            }
+
+            #overlay.hidden {
+                display: none;
+            }
+
         </style>
 
         <app-location route="{{route}}"></app-location>
@@ -148,6 +175,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </iron-pages>
             </app-header-layout>
         </app-drawer-layout>
+
+        <popup-notifications></popup-notifications>
+        <paper-spinner></paper-spinner>
+        <div id="overlay" class="hidden"></div>
     </template>
 
     <script>
@@ -276,6 +307,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 checkAuthToken: function() {
                     this.querySelector('profile-view').checkAuthenticationToken();
+                },
+                showNotification: function(id) {
+                    this.$$('popup-notifications').show(id);
+                },
+                spinner: function(status) {
+                    this.$$('paper-spinner').active = status;
+                    if (status) {
+                        this.$$('#overlay').classList.remove('hidden');
+                    } else {
+                        this.$$('#overlay').classList.add('hidden');
+                    }
                 }
             });
         })();

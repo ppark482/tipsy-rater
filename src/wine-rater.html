@@ -66,7 +66,7 @@
         </style>
 
         <div class="fit layout vertical" style="width:100%;">
-            <p class="card instructions">take a picture of the wine label</p>
+            <p class="instructions">take a picture of the wine label or name</p>
             <input id="file" type="file" name="file" accept="image/*" capture on-change="_handleImage" class="custom-file-input" hidden$="{{previewing}}">
             <img id="previewImage" hidden$="{{!previewing}}">
             <paper-button class="good-button" hidden$="{{!previewing}}" on-tap="_toWineStats">touch me again</paper-button>
