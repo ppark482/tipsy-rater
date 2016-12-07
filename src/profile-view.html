@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/google-signin/google-signin.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 
 <link rel="import" href="shared-styles.html">
 
@@ -11,7 +12,15 @@
                 padding: 10px;
             }
         </style>
-
+        <iron-ajax
+            id="checkAuthToken"
+            handle-as="json"
+            processData="false"
+            on-response="_authTokenSuccess"
+            on-error="_authTokenError"
+            withCredentials="true">
+        </iron-ajax>
+        <h2>Google signin necessary to save images to your google drive.</h2>
         <google-signin 
             theme="dark" 
             client-id="867389108662-ml3u1clb60k7oqam0bcai4bt207u88j0.apps.googleusercontent.com" 
@@ -34,51 +43,47 @@
                     signedIn: {
                         type: Boolean,
                         notify: true,
-                        observer: '_userObserver'
+                        observer: '_handleGoogleSignedOut'
                     }
                 },
                 listeners: {
-                    'google-signin-success' : '_googleSignInSuccess' 
+                    'google-signin-success' : '_googleSignInSuccess',
+                    'google-signed-out' : '_handleGoogleSignedOut'
+                },
+                _activeRoute: function() {
+
                 },
                 _googleSignInSuccess: function() {
-                    document.querySelector('my-app').storeUser(gapi.auth2.getAuthInstance()['currentUser'].get());
-                    document.querySelector('my-app').setUser();
-                    document.querySelector('my-app').setAuthToken(gapi.auth2.getAuthInstance()['currentUser'].get().Zi.access_token);
-                    console.log(gapi.auth2.getAuthInstance()['currentUser'].get());
-                    this._activeRoute();
+                    var app = document.querySelector('my-app');
+                    app.storeUser(gapi.auth2.getAuthInstance()['currentUser'].get());
+                    app.setUser();
+                    app.setAuthToken(gapi.auth2.getAuthInstance()['currentUser'].get().Zi.access_token);
+                    // console.log(gapi.auth2.getAuthInstance()['currentUser'].get());
+                    window.history.pushState({}, null, '/');
+                    window.dispatchEvent(new CustomEvent('location-changed'));
+
                 },
-                _userObserver: function() {
+                _handleGoogleSignedOut: function() {
                     if (this.signedIn === false) {
-                        document.querySelector('my-app').removeUser();
+                        var app = document.querySelector('my-app');
+                        app.removeUser();
+                        app.setAuthToken('');
                     }
                 },
-                _activeRoute: function (route) {
-                    // if (this.signedIn) {
-                    //     window.history.pushState({}, null, '/dashboard');
-                    //     window.dispatchEvent(new CustomEvent('location-changed'));
-                    // }
-                    // if(route && route.path && route.path.split('/')[1] === 'login') {
-                    //     this.pageName = 'Login';
-                    //     document.querySelector('my-app').setClosed();
-
-                    //     this.email = "";
-                    //     this.password = "";
-                    //     this.forgotEmail = "";
-                    //     this.signInErrorMessage = "";
-                    //     this.signInErrorInvalid = false;
-
-                    //     // Login
-                    //     this.$.submitLogin.url = document.querySelector('my-app').getAuth() + '/oauth/token';
-                    //     this.$.submitLogin.headers = {
-                    //         'Accept-Language': 'en-US;q=1',
-                    //         'Authorization': 'Basic YWRtaW46c29tZXNlY3JldA==',
-                    //         'Content-Type': 'application/x-www-form-urlencoded',
-                    //         'Accept': 'application/json'
-                    //     };
-
-                    //     // Password Reset
-                    //     this.$.submitPasswordReset.url = document.querySelector('my-app').getAuth() + '/lostpassword';
-                    // }
+                _authTokenError: function(e) {
+                    window.history.pushState({}, null, '/profile');
+                    window.dispatchEvent(new CustomEvent('location-changed'));
+                },
+                _authTokenSuccess: function() {
+                },
+                checkAuthenticationToken: function() {
+                    var app = document.querySelector('my-app');
+                    if (app.getAuthToken()) {
+                        this.$.checkAuthToken.url = 'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=' + app.getAuthToken();
+                        this.$.checkAuthToken.generateRequest();
+                    } else {
+                        this._authTokenError();
+                    }
                 }
             });
         })();

@@ -21,6 +21,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="my-icons.html">
+<link rel="import" href="profile-view.html">
 
 <dom-module id="my-app">
     <template>
@@ -98,7 +99,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 <app-header condenses reveals effects="waterfall">
                     <app-toolbar>
-                        <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+                        <paper-icon-button icon="menu" drawer-toggle></paper-icon-button style="display:none;">
                         <div main-title>{{loggedInMessage}}</div>
                     </app-toolbar>
                 </app-header>
@@ -111,7 +112,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     role="main">
                     <profile-view name="profile"
                         active-route="[[route]]"
-                        page-name="{{pageName">
+                        page-name="{{pageName}}">
                     </profile-view>
                     <my-dashboard 
                         name="dashboard" 
@@ -196,11 +197,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 ],
                 _routePageChanged: function(page) {
                     if (this.route.path === '/') {
-                        window.history.pushState({}, null, '/dashboard');
+                        window.history.pushState({}, null, '/wine/snap');
                         window.dispatchEvent(new CustomEvent('location-changed'));
                         return;
                     }
-                    this.page = page || 'dashboard';
+                    this.page = page || 'wine/snap';
                     if (this.subrouteData && this.subrouteData.subpage){
                         this.subpage = this.subrouteData.subpage;
                     } else {
@@ -254,13 +255,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     }
                 },
                 setAuthToken: function(token) {
-                    localStorage.setItem('google-token', token);
+                    if (token === '') {
+                        localStorage.removeItem('google-token');
+                    } else {
+                        localStorage.setItem('google-token', token);
+                    }
                 },
                 getAuthToken: function() {
                     return localStorage.getItem('google-token');
                 },
                 attached: function() {
-                    this.setUser();
+                    if (this.getUser()) {
+                        this.setUser();
+                        this.checkAuthToken();
+                    } else {
+                        window.history.pushState({}, null, '/profile');
+                        window.dispatchEvent(new CustomEvent('location-changed'));
+                    }
+                },
+                checkAuthToken: function() {
+                    this.querySelector('profile-view').checkAuthenticationToken();
                 }
             });
         })();

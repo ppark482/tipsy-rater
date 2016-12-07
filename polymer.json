@@ -2,7 +2,6 @@
   "entrypoint": "index.html",
   "shell": "src/my-app.html",
   "fragments": [
-    "src/profile-view.html",
     "src/my-dashboard.html",
     "src/wine-rater.html",
     "src/my-view404.html",
