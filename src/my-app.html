@@ -9,12 +9,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<!-- <link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html"> -->
 <link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
 <link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
 <link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
-<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<!-- <link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html"> -->
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
@@ -148,11 +148,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         page-name="{{pageName}}"
                         signed-in="{{signedIn}}">
                     </profile-view>
-                    <my-dashboard 
+<!--                     <my-dashboard 
                         name="dashboard" 
                         active-route="[[route]]"
                         page-name="{{pageName}}">
-                    </my-dashboard>
+                    </my-dashboard> -->
                     <iron-pages
                         name="wine"
                         selected="[[subrouteData.subpage]]"
@@ -226,6 +226,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     imageToUpload: {
                         type: Object,
+                        notify: true,
+                        reflectToAttribute: true
+                    },
+                    imageData: {
+                        type: String,
+                        notify: true,
+                        reflectToAttribute: true
+                    },
+                    signedIn: {
+                        type: Boolean,
                         notify: true,
                         reflectToAttribute: true
                     }
