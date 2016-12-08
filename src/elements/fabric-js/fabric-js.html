@@ -91,14 +91,20 @@
                     return text;
                 },
                 generateImage: function() {
-                    var viewportWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-                    var viewportHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
                     var canvas = new fabric.StaticCanvas('c');
 
                     var imageHeight;
                     fabric.Image.fromURL(this.imageData, function(oImg) {
                         // oImg.setWidth(canvas.width);
                         // console.log(oImg);
+                        oImg.filters.push(
+                            new fabric.Image.filters.Resize({
+                                resizeType: 'sliceHack',
+                                scaleX: 0.8,
+                                scaleY: 0.8
+                            })
+                        );
+                        oImg.applyFilters();
                         imageHeight = oImg.height;
                         canvas.setDimensions({
                             width: oImg.width,
