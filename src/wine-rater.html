@@ -96,11 +96,9 @@
                     }
                 },
                 _activeRoute: function (route) {
-                    if (document.querySelector('my-app').checkAuthToken()) {
-                        if (route && route.path && route.path.split('/')[1] === 'wine' && route.path.split('/')[2] === 'snap') {
-                            this.pageName = 'Wine';
-                        }                        
-                    }
+                    if (route && route.path && route.path.split('/')[1] === 'wine' && route.path.split('/')[2] === 'snap') {
+                        this.pageName = 'Wine';
+                    }                        
                 },
                 _handleImage: function(e) {
                     var app = document.querySelector('my-app');

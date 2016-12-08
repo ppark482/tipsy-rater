@@ -32,8 +32,7 @@
                 width="wide"
                 theme="dark" 
                 client-id="867389108662-ml3u1clb60k7oqam0bcai4bt207u88j0.apps.googleusercontent.com" 
-                scopes="https://www.googleapis.com/auth/drive"
-                signed-in="{{signedIn}}">
+                scopes="https://www.googleapis.com/auth/drive">
             </google-signin>
         </div>
     </template>
@@ -51,40 +50,34 @@
                     signedIn: {
                         type: Boolean,
                         notify: true,
-                        observer: '_handleGoogleSignedOut'
+                        reflectToAttribute: true
                     }
                 },
                 listeners: {
-                    'google-signin-success' : '_googleSignInSuccess',
-                    'google-signed-out' : '_handleGoogleSignedOut'
+                    'google-signin-success' : '_googleSignInSuccess'
                 },
                 _activeRoute: function() {
-
+                    // console.log(this.querySelector('google-signin').signedIn);
                 },
                 _googleSignInSuccess: function() {
                     var app = document.querySelector('my-app');
-                    app.storeUser(gapi.auth2.getAuthInstance()['currentUser'].get());
-                    app.setUser();
+                    // app.storeUser(gapi.auth2.getAuthInstance()['currentUser'].get());
+                    // app.setUser();
                     app.setAuthToken(gapi.auth2.getAuthInstance()['currentUser'].get().Zi.access_token);
                     // console.log(gapi.auth2.getAuthInstance()['currentUser'].get());
-                    window.history.pushState({}, null, '/');
-                    window.dispatchEvent(new CustomEvent('location-changed'));
+                    this._authTokenSuccess();
 
                 },
-                _handleGoogleSignedOut: function() {
-                    if (this.signedIn === false) {
-                        var app = document.querySelector('my-app');
-                        app.removeUser();
-                        app.setAuthToken('');
-                    }
-                },
                 _authTokenError: function(e) {
-                    // this.$$('google-signin').signOut();
-                    this._handleGoogleSignedOut();
-                    window.history.pushState({}, null, '/profile');
-                    window.dispatchEvent(new CustomEvent('location-changed'));
+                    // console.log('auth token error');
+                    this.signedIn = false;
                 },
-                _authTokenSuccess: function() {
+                _authTokenSuccess: function(response) {
+                    // console.log('auth token good: ', response.target.lastResponse);
+                    this.signedIn = true;
+                    window.history.pushState({}, null, '/wine/snap');
+                    window.dispatchEvent(new CustomEvent('location-changed'));
+
                 },
                 checkAuthenticationToken: function() {
                     var app = document.querySelector('my-app');

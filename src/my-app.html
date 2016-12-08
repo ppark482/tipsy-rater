@@ -145,7 +145,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     role="main">
                     <profile-view name="profile"
                         active-route="[[route]]"
-                        page-name="{{pageName}}">
+                        page-name="{{pageName}}"
+                        signed-in="{{signedIn}}">
                     </profile-view>
                     <my-dashboard 
                         name="dashboard" 
@@ -233,16 +234,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     '_routePageChanged(routeData.page)'
                 ],
                 _routePageChanged: function(page) {
-                    if (this.route.path === '/') {
-                        window.history.pushState({}, null, '/wine/snap');
-                        window.dispatchEvent(new CustomEvent('location-changed'));
-                        return;
-                    }
-                    this.page = page || 'wine/snap';
-                    if (this.subrouteData && this.subrouteData.subpage){
-                        this.subpage = this.subrouteData.subpage;
+                    if (this.signedIn) {
+                        if (this.route.path === '/') {
+                            window.history.pushState({}, null, '/wine/snap');
+                            window.dispatchEvent(new CustomEvent('location-changed'));
+                            return;
+                        }
+                        this.page = page || 'wine/snap';
+                        if (this.subrouteData && this.subrouteData.subpage){
+                            this.subpage = this.subrouteData.subpage;
+                        } else {
+                            this.subpage = '';
+                        }
+
                     } else {
-                        this.subpage = '';
+                        window.history.pushState({}, null, '/profile');
+                        window.dispatchEvent(new CustomEvent('location-changed'));   
                     }
                 },
                 _pageChanged: function(page) {
@@ -259,33 +266,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 _showPage404: function() {
                     this.page = 'view404';
                 },
-                removeUser: function() {
-                    localStorage.removeItem('google-user');
-                    this.firstName = '';
-                    // this.lastName = '';
-                    // this.profilePhoto = '';
-                    // this.email = '';
-                    this.setUser();
+                // removeUser: function() {
+                //     localStorage.removeItem('google-user');
+                //     this.firstName = '';
+                //     // this.lastName = '';
+                //     // this.profilePhoto = '';
+                //     // this.email = '';
+                //     this.setUser();
 
-                },
-                storeUser: function(user) {
-                    localStorage.setItem('google-user', JSON.stringify(user));
-                },
-                getUser: function() {
-                    return JSON.parse(localStorage.getItem('google-user'));
-                },
-                setUser: function() {
-                    var user = this.getUser();
-                    if (user) {
-                        this.firstName = user.w3.ofa;
-                        this.loggedInMessage = 'logged in as ' + this.firstName;
-                        // this.lastName = user.w3.wea;
-                        // this.profilePhoto = user.w3.Paa;
-                        // this.email = user.w3.U3;
-                    } else {
-                        this.loggedInMessage = 'not logged in';
-                    }
-                },
+                // },
+                // storeUser: function(user) {
+                //     localStorage.setItem('google-user', JSON.stringify(user));
+                // },
+                // getUser: function() {
+                //     return JSON.parse(localStorage.getItem('google-user'));
+                // },
+                // setUser: function() {
+                //     var user = this.getUser();
+                //     if (user) {
+                //         this.firstName = user.w3.ofa;
+                //         this.loggedInMessage = 'logged in as ' + this.firstName;
+                //         // this.lastName = user.w3.wea;
+                //         // this.profilePhoto = user.w3.Paa;
+                //         // this.email = user.w3.U3;
+                //     } else {
+                //         this.loggedInMessage = 'not logged in';
+                //     }
+                // },
                 setAuthToken: function(token) {
                     if (token === '') {
                         localStorage.removeItem('google-token');
@@ -297,13 +304,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     return localStorage.getItem('google-token');
                 },
                 attached: function() {
-                    if (this.getUser()) {
-                        this.setUser();
-                        this.checkAuthToken();
-                    } else {
-                        window.history.pushState({}, null, '/profile');
-                        window.dispatchEvent(new CustomEvent('location-changed'));
-                    }
+                    this.checkAuthToken();
                 },
                 checkAuthToken: function() {
                     this.querySelector('profile-view').checkAuthenticationToken();

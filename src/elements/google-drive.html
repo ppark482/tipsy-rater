@@ -74,6 +74,7 @@
                     window.dispatchEvent(new CustomEvent('location-changed'));
                 },
                 _saveWineToDriveError: function(error) {
+                    // console.log('error saving wine: ', error);
                     document.querySelector('my-app').showNotification('errorSavingWine');
                     document.querySelector('my-app').spinner(false);
                     this.generatedImage = '';
